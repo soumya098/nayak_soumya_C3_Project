@@ -1,7 +1,10 @@
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -9,6 +12,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RestaurantTest {
     Restaurant restaurant;
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
     //REFACTOR ALL THE REPEATED LINES OF CODE
     @BeforeEach
     public void setUp(){
@@ -17,6 +23,13 @@ class RestaurantTest {
         restaurant =new Restaurant("Amelie's cafe","Chennai",openingTime,closingTime);
         restaurant.addToMenu("Sweet corn soup",119);
         restaurant.addToMenu("Vegetable lasagne", 269);
+
+        System.setOut(new PrintStream(outputStreamCaptor));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        System.setOut(standardOut);
     }
 
     //>>>>>>>>>>>>>>>>>>>>>>>>>OPEN/CLOSED<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -78,6 +91,13 @@ class RestaurantTest {
     public void total_order_value_should_throw_exception_when_item_is_not_in_menu() {
         List<String> items = List.of("Sweet corn soup", "Vegetable lasagne", "French fries");
         assertThrows(itemNotFoundException.class, () -> restaurant.totalOrderValue(items));
+    }
+
+    @Test
+    public void display_details_should_return_correct_string() {
+        String expectedOutput = "Restaurant:Amelie's cafe\nLocation:Chennai\nOpening time:10:30\nClosing time:22:00\nMenu:\n" + restaurant.getMenu();
+        restaurant.displayDetails();
+        assertEquals(expectedOutput, outputStreamCaptor.toString().trim());
     }
 
 }

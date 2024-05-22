@@ -27,11 +27,12 @@ public class Restaurant {
         return menu;
     }
 
-    private Item findItemByName(String itemName){
+    private Item findItemByName(String itemName) throws itemNotFoundException {
         for(Item item: menu) {
             if(item.getName().equals(itemName))
                 return item;
         }
+
         return null;
     }
 
@@ -61,10 +62,15 @@ public class Restaurant {
         return name;
     }
 
-    public Integer totalOrderValue(List<String> items) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'totalOrderValue'");
+    public Integer totalOrderValue(List<String> items) throws itemNotFoundException {
+        int totalValue = 0;
+        for(String itemName: items){
+            Item item = findItemByName(itemName);
+            if(item == null) {
+                throw new itemNotFoundException("Item could not found");
+            }
+            totalValue += item.getPrice();
+        }
+        return totalValue;
     }
-
-
 }
